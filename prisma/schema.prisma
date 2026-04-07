@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model instructions {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id  String?   @db.Uuid
+  name        String?   @db.VarChar(50)
+  instruction String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @db.Timestamptz(6)
+}
+
+model log {
+  id          Int       @id @default(autoincrement())
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  event       String?   @db.VarChar(50)
+  name        String?   @db.VarChar(50)
+  run_id      String?   @db.VarChar(50)
+  tags        String?   @db.VarChar(50)
+  metadata    String?
+  data        String?
+  all_content String?
+}
+
+model log_cada_chunk {
+  id                Int       @id @default(autoincrement())
+  chunk             String?   @db.VarChar(1024)
+  iteration         Int?
+  thread_id         String?   @db.Uuid
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  content           String?   @db.VarChar(255)
+  args              String?   @db.VarChar(255)
+  response_metadata String?   @db.VarChar(255)
+}
+
+model log_geral {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  text       String?
+}
+
+model log_uso {
+  id               Int       @id @default(autoincrement())
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  type             String?   @db.VarChar(50)
+  text             String?
+  time_elapsed_sec Decimal?  @db.Decimal(15, 3)
+  thread_id        String?   @db.Uuid
+}
+
+model profiles {
+  id                  String    @id(map: "profiles_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  apikey              String?   @db.VarChar
+  name                String?   @db.VarChar
+  system_prompt       String?   @db.VarChar
+  system_prompt_teste String?   @db.VarChar
+  db_schema           String?   @db.VarChar
+  created_at          DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime? @db.Timestamptz(6)
+}
+
+model thread_messages {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  thread_id         String?   @db.Uuid
+  role              String?   @db.VarChar(50)
+  content           String?
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime? @db.Timestamptz(6)
+  user_id           String?   @db.VarChar(50)
+  access_profile_id String?   @db.VarChar(50)
+}
+
+model threads {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id        String?   @db.Uuid
+  title             String?   @db.VarChar(50)
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime? @db.Timestamptz(6)
+  user_id           String?   @db.VarChar(50)
+  access_profile_id String?   @db.VarChar(50)
+}
