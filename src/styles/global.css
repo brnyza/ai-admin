@@ -1,0 +1,42 @@
+.report-style-class {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+}
+
+#__next {
+  height: 100%;
+  width: 100%;
+}
+
+html,
+body {
+  overflow: hidden;
+  /* overflow-y: auto; */
+}
+
+.gantt-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.gantt-scroll::-webkit-scrollbar-track {
+  background: #111;
+}
+
+.gantt-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #444, #666);
+  border-radius: 8px;
+}
+
+.gantt-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #666, #888);
+}
