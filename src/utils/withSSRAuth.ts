@@ -28,7 +28,6 @@ export function withSSRAuth<P>(fn: (ctx: GetServerSidePropsContext, user: UserPr
     }
 
     const sessionToken = jwt.decode(token) as { sub: string }
-    console.log('withSSRAuth sessionToken', { sessionToken })
     const storageUser = await prisma.sec_users.findUnique({
       where: {
         id: Number(sessionToken.sub)

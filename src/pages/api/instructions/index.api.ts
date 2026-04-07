@@ -2,12 +2,15 @@ import { prisma } from '@/libs/prisma'
 import { withAuth } from '@/middlewares'
 import { withLog } from '@/middlewares/withLog'
 
-const getProfiles = async () => {
-  const result = await prisma.profiles.findMany({ orderBy: { name: 'asc' } })
+const getInstructions = async (profile_id?: string) => {
+  const result = await prisma.instructions.findMany({
+    where: profile_id ? { profile_id } : {},
+    orderBy: { created_at: 'desc' }
+  })
   return result
 }
 
-export type ApiProfiles = Awaited<ReturnType<typeof getProfiles>>
+export type ApiInstructions = Awaited<ReturnType<typeof getInstructions>>
 
 const handler = async (req: any, res: any) => {
   try {
@@ -22,20 +25,14 @@ const handler = async (req: any, res: any) => {
   }
 
   async function GET() {
-    const { id } = req.query
-    if (id) {
-      const result = await prisma.profiles.findUnique({
-        where: { id: String(id) }
-      })
-      return res.json(result)
-    }
-    const result = await getProfiles()
+    const { profile_id } = req.query
+    const result = await getInstructions(profile_id as string)
     return res.json(result)
   }
 
   async function POST() {
     const data = req.body
-    const result = await prisma.profiles.create({ data })
+    const result = await prisma.instructions.create({ data })
     return res.status(201).json(result)
   }
 
@@ -48,7 +45,7 @@ const handler = async (req: any, res: any) => {
     delete data.created_at
     delete data.updated_at
 
-    const result = await prisma.profiles.update({
+    const result = await prisma.instructions.update({
       where: { id: String(id) },
       data: {
         ...data,
@@ -60,7 +57,7 @@ const handler = async (req: any, res: any) => {
 
   async function DELETE() {
     const { id } = req.query
-    await prisma.profiles.delete({
+    await prisma.instructions.delete({
       where: { id: String(id) }
     })
     return res.json({ msg: 'ok' })

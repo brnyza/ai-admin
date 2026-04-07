@@ -1,57 +1,26 @@
-// import { prisma } from '@/libs/prisma'
-// import type { NextApiRequestWithAuth } from '@/types/session'
-// import { moment } from '@/utils/moment'
-// import { PrismaParser } from '@/utils/prismaParser'
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+import { prisma } from '@/libs/prisma'
+import type { NextApiHandlerWithAuth, NextApiRequestWithAuth } from '@/types/session'
 
-// export const createLog = async (req: NextApiRequestWithAuth) => {
-//   const { url, method, user } = req
+export const withLog = (handler: NextApiHandler | NextApiHandlerWithAuth) => {
+  return async (req: NextApiRequestWithAuth | NextApiRequest, res: NextApiResponse) => {
+    const { url, method } = req
+    const user = (req as NextApiRequestWithAuth).user
 
-//   const urlWthQueries = url?.split('/api')[1]
-//   const [onlyURL, params] = urlWthQueries?.split('?') || []
-//   const body = JSON.stringify(req.body)
+    const urlWthQueries = url?.split('/api')[1]
+    const [onlyURL, params] = urlWthQueries?.split('?') || []
 
-//   const hasParamId = params?.match(/id/gi)
+    await prisma.sec_log.create({
+      data: {
+        method: method || '',
+        url: onlyURL || '',
+        user: user?.email,
+        params: params || undefined,
+        body: req.body ? JSON.stringify(req.body) : undefined,
+        ip: (req.headers['x-forwarded-for'] as string) || (req.socket.remoteAddress as string)
+      }
+    })
 
-//   const schemaName = onlyURL?.replace(/\//g, '').replace(/-/g, '_') as string
-//   let previousBody = ''
-
-//   if (prisma[schemaName] && hasParamId && req?.method?.match(/put|delete/i)) {
-//     try {
-//       const parser = new PrismaParser()
-//       const parserModel = parser.parseModel(schemaName)
-//       const primaryKey = parserModel.find((column) => column.isPrimary)
-
-//       const idParamsValue = params ? params.split('&').find((param) => param.includes('$primaryKey.column')) : ''.split('=').pop()
-
-//       if (primaryKey) {
-//         const previousData = await prisma[schemaName].findFirst({
-//           where: {
-//             [primaryKey?.column]: primaryKey.type === 'Int' ? Number(idParamsValue) : idParamsValue
-//           }
-//         })
-
-//         previousBody = JSON.stringify(previousData)
-//       } else {
-//         previousBody = JSON.stringify({
-//           error: 'Não foi possível acessar o conteúdo da rota'
-//         })
-//       }
-//     } catch (error) {
-//       previousBody = JSON.stringify({
-//         error: 'Não foi possível acessar o conteúdo da rota'
-//       })
-//     }
-//   }
-
-//   await prisma.sec_log.create({
-//     data: {
-//       method: method || '',
-//       url: onlyURL || '',
-//       user,
-//       params,
-//       body,
-//       previous_body: previousBody,
-//       created_at: moment().subtract(3, 'hours').toDate()
-//     }
-//   })
-// }
+    return (handler as NextApiHandlerWithAuth)(req as NextApiRequestWithAuth, res)
+  }
+}

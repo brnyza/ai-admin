@@ -10,10 +10,9 @@ const handler: NextApiHandlerWithAuth = async (req, res) => {
   return res.status(405).json({ error: 'Método inválido' })
 
   async function GET() {
-    console.log('me api', { user: req.user })
     const user = await prisma.sec_users.findUnique({
       where: {
-        id: Number(req.user)
+        id: Number(req.user.id)
       }
       // include: {
       //   sec_users_groups: {

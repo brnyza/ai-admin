@@ -101,3 +101,15 @@ model sec_users {
   email             String?             @unique(map: "newtable_unique") @db.VarChar
   sec_refresh_token sec_refresh_token[]
 }
+
+model sec_log {
+  id         Int       @id(map: "log_geral_pkey_1") @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  user       String?
+  url        String?   @db.VarChar
+  method     String?   @db.VarChar
+  body       String?   @db.VarChar
+  params     String?   @db.VarChar
+  ip         String?   @db.VarChar
+  remarks    String?   @db.VarChar
+}

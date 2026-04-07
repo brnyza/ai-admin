@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import type { NextApiResponse } from 'next'
-import type { NextApiHandlerWithAuth, NextApiRequestWithAuth } from '@/types/session'
+import type { DecodedToken, NextApiHandlerWithAuth, NextApiRequestWithAuth } from '@/types/session'
 
 function withUserData(handler: NextApiHandlerWithAuth) {
   return async (req: NextApiRequestWithAuth, res: NextApiResponse) => {
@@ -13,9 +13,8 @@ function withUserData(handler: NextApiHandlerWithAuth) {
     if (!token) return res.status(401).json({ error: 'Token inválido', code: 'token.invalid' })
 
     try {
-      const decoded = jwt.decode(token as string) as any
-      console.log({ decoded })
-      req.user = decoded.sub
+      const decoded = jwt.decode(token as string) as DecodedToken
+      req.user = decoded.user
       return handler(req, res)
     } catch (error) {
       return res.status(401).json({ error: 'Token inválido', code: 'token.invalid' })
