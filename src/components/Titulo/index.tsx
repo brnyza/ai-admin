@@ -1,9 +1,9 @@
+import { IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import Head from 'next/head'
-import { Typography, IconButton, Tooltip, Stack } from '@mui/material'
 import Router from 'next/router'
 import { MdArrowBack } from 'react-icons/md'
 
-const TituloGlobal = ({ nome }) => {
+const TituloGlobal = ({ nome }: { nome: string }) => {
   return (
     <>
       <Head>
@@ -23,16 +23,12 @@ const TituloGlobal = ({ nome }) => {
             <MdArrowBack />
           </IconButton>
         </Tooltip>
-        <Typography
-          variant="h6"
-          component="h1"
-          fontWeight="bold"
-          color="GrayText"
-        >
+        <Typography variant="h6" component="h1" fontWeight="bold" color="GrayText">
           {nome}
         </Typography>
       </Stack>
     </>
   )
 }
+
 export { TituloGlobal }

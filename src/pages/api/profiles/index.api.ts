@@ -1,5 +1,12 @@
 import { prisma } from '@/libs/prisma'
 
+const getProfiles = async () => {
+  const result = await prisma.profiles.findMany()
+  return result
+}
+
+export type IProfile = Awaited<ReturnType<typeof getProfiles>>[number]
+
 const handler = async (req: any, res: any) => {
   try {
     if (req.method === 'GET') return await GET()
@@ -11,7 +18,7 @@ const handler = async (req: any, res: any) => {
   }
 
   async function GET() {
-    const result = await prisma.profiles.findMany()
+    const result = await getProfiles()
     return res.json({ msg: 'ok', result })
   }
 }

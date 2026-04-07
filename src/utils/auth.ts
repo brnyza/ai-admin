@@ -46,7 +46,7 @@ export const hashPassword = (password: string): string => {
 
 export async function generateJwtAndRefreshToken(userId: number, payload: object = {}) {
   const token = jwt.sign(payload, JWT_SECRET, {
-    subject: String(userId),
+    subject: String(userId), // sub
     expiresIn: '1d'
   })
 

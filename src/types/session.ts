@@ -14,4 +14,5 @@ export type NextApiHandlerWithAuth<T = void> = (req: NextApiRequestWithAuth, res
 
 export type DecodedToken = {
   sub: string
+  user: JwtUserData
 }

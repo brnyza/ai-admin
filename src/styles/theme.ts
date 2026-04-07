@@ -8,7 +8,7 @@ export const standardTheme = createTheme({
       secondary: grey[600]
     },
     primary: {
-      main: '#339544'
+      main: '#303030ff'
     },
     info: {
       500: '#305496'

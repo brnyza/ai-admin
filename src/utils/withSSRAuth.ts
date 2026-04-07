@@ -1,9 +1,7 @@
-import type { sec_groups } from 'generated/prisma/client'
 import jwt from 'jsonwebtoken'
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
 import { parseCookies } from 'nookies'
 import { prisma } from '@/libs/prisma'
-import { validateUserPermissions } from '@/utils/validateUserPermissions'
 import { config } from './config'
 
 type WithSSRAuthOptions = {
@@ -11,8 +9,8 @@ type WithSSRAuthOptions = {
 }
 
 type UserProps = {
-  id: string
-  groups: sec_groups[]
+  id: number
+  // groups: sec_groups[]
 }
 
 export function withSSRAuth<P>(fn: (ctx: GetServerSidePropsContext, user: UserProps) => Promise<GetServerSidePropsResult<P>>, options?: WithSSRAuthOptions) {
@@ -30,17 +28,18 @@ export function withSSRAuth<P>(fn: (ctx: GetServerSidePropsContext, user: UserPr
     }
 
     const sessionToken = jwt.decode(token) as { sub: string }
+    console.log('withSSRAuth sessionToken', { sessionToken })
     const storageUser = await prisma.sec_users.findUnique({
       where: {
-        login: sessionToken.sub
-      },
-      include: {
-        sec_users_groups: {
-          select: {
-            sec_groups: true
-          }
-        }
+        id: Number(sessionToken.sub)
       }
+      // include: {
+      //   sec_users_groups: {
+      //     select: {
+      //       sec_groups: true
+      //     }
+      //   }
+      // }
     })
     // await prisma.$disconnect()
 
@@ -54,23 +53,23 @@ export function withSSRAuth<P>(fn: (ctx: GetServerSidePropsContext, user: UserPr
     }
 
     const user = {
-      id: storageUser.login,
-      groups: storageUser.sec_users_groups.map((groups) => groups.sec_groups)
+      id: storageUser.id
+      // groups: storageUser.sec_users_groups.map((groups) => groups.sec_groups)
     }
 
-    if (options) {
-      const { groups } = options
-      const userHasValidPermissions = validateUserPermissions({
-        user,
-        groups
-      })
+    // if (options) {
+    //   const { groups } = options
+    //   const userHasValidPermissions = validateUserPermissions({
+    //     user,
+    //     groups
+    //   })
 
-      if (!userHasValidPermissions) {
-        return {
-          notFound: true
-        }
-      }
-    }
+    //   if (!userHasValidPermissions) {
+    //     return {
+    //       notFound: true
+    //     }
+    //   }
+    // }
 
     try {
       return await fn(ctx, user)

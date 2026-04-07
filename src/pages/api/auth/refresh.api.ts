@@ -13,9 +13,10 @@ export const handler: NextApiHandlerWithAuth = async (req, res) => {
     const { refreshToken } = req.body
     if (!refreshToken) return res.status(401).json({ error: 'Refresh Token não encontrado' })
 
+    console.log('refresh api', { userId })
     const user = await prisma.sec_users.findUnique({
       where: {
-        id: userId.id
+        id: Number(userId)
       }
       // include: {
       //   sec_users_groups: {

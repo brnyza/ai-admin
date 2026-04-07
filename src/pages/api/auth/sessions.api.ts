@@ -1,6 +1,7 @@
 import type { NextApiHandler } from 'next'
 import { prisma } from '@/libs/prisma'
 import { withCors } from '@/middlewares/withCors'
+import type { JwtUserData } from '@/types/session'
 import { comparePassword, generateJwtAndRefreshToken } from '@/utils/auth'
 
 const handler: NextApiHandler = async (req, res) => {
@@ -9,7 +10,7 @@ const handler: NextApiHandler = async (req, res) => {
 
   async function POST() {
     const { email, password } = req.body
-    const user = await prisma.sec_users.findFirst({ select: { pswd: true, id: true }, where: { email } })
+    const user = await prisma.sec_users.findFirst({ select: { pswd: true, id: true, email: true, name: true }, where: { email } })
 
     if (!user) return res.status(401).json({ error: 'Email ou senha incorreta' })
     if (!user.pswd) return res.status(401).json({ error: 'Usuário sem senha' })
@@ -18,7 +19,7 @@ const handler: NextApiHandler = async (req, res) => {
 
     if (!isValidPassword) return res.status(401).json({ error: 'Email ou senha incorreta' })
 
-    const { refreshToken, token } = await generateJwtAndRefreshToken(user.id, {})
+    const { refreshToken, token } = await generateJwtAndRefreshToken(user.id, { user: { id: user.id, email: user.email, name: user.name } as JwtUserData })
 
     // await prisma.$disconnect()
 

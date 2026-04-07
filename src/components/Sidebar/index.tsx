@@ -75,18 +75,18 @@ const Sidebar: FC = () => {
 
   const mobile = useMediaQuery('(max-width: 500px)')
 
-  async function getMenuApps() {
-    setLoading(true)
-    try {
-      const { data } = await api.get<MenuAppsResponse[]>('/apps/menu')
-      const formattedMenu = formatMenu(data)
-      setMenu(formattedMenu)
-    } catch (error) {
-      createAlert(getErrorMessage(error), 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+  // async function getMenuApps() {
+  //   setLoading(true)
+  //   try {
+  //     const { data } = await api.get<MenuAppsResponse[]>('/apps/menu')
+  //     const formattedMenu = formatMenu(data)
+  //     setMenu(formattedMenu)
+  //   } catch (error) {
+  //     createAlert(getErrorMessage(error), 'error')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
   function mudaDrawerStatus(valor: 'Open' | 'Close') {
     drawerStatus.current = valor
     forceRender((prev) => prev + 1)
@@ -118,9 +118,9 @@ const Sidebar: FC = () => {
       createAlert(getErrorMessage(error), 'error')
     }
   }
-  useEffect(() => {
-    if (user) getMenuApps()
-  }, [user])
+  // useEffect(() => {
+  //   if (user) getMenuApps()
+  // }, [user])
 
   useEffect(() => {
     if (mobile) {
@@ -197,7 +197,7 @@ const Sidebar: FC = () => {
 
                 return <SideMenuItem key={index} title={item.display_name} to={item.url} currentPage={router.asPath.startsWith(item.url) && item.url !== '/'} icon={item.icon} onClick={() => mudaDrawerStatus('Close')} />
               })}
-              <SideMenuItem title="ChamadosBM" icon="MdCall" onClick={handleNavigateToTickets} />
+              {/* <SideMenuItem title="ChamadosBM" icon="MdCall" onClick={handleNavigateToTickets} /> */}
             </>
           )}
         </Box>

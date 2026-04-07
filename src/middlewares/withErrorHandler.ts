@@ -10,7 +10,7 @@ export const withErrorHandler = (handler: NextApiHandlerWithAuth | NextApiHandle
       if (error instanceof PrismaClientKnownRequestError) {
         return res.status(400).json({ error: prismaErrorMsg(error) })
       }
-      return res.status(500).json({ error: error.message })
+      return res.status(500).json({ error: (error as any).message })
     }
   }
 }

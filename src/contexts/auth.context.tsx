@@ -1,5 +1,4 @@
 import { useAlert } from '@bluemarble/bm-components'
-import type { sec_groups } from 'generated/prisma/client'
 import Router from 'next/router'
 import { parseCookies, setCookie } from 'nookies'
 import { createContext, type FC, type ReactNode, useEffect, useState } from 'react'
@@ -11,7 +10,7 @@ interface UserProps {
   id: string
   name: string
   email: string
-  groups: sec_groups[]
+  // groups: sec_groups[]
 }
 
 interface SignInCredentials {
@@ -62,9 +61,9 @@ export const AuthProvider: FC<IAuthProvider> = ({ children }) => {
       api.defaults.headers.common.Authorization = `Bearer ${token}`
 
       const { data } = await api.get('/auth/me')
-      const { name, id, groups } = data
+      const { name, id } = data
 
-      setUser({ email, name, id, groups })
+      setUser({ email, name, id })
       setStatus('autenticated')
       return true
     } catch (error) {
@@ -87,9 +86,9 @@ export const AuthProvider: FC<IAuthProvider> = ({ children }) => {
       api
         .get('/auth/me')
         .then((response) => {
-          const { email, name, id, groups } = response.data
+          const { email, name, id } = response.data
           setStatus('autenticated')
-          setUser({ email, name, id, groups })
+          setUser({ email, name, id })
         })
         .catch(() => {
           setStatus('unauthenticated')
