@@ -1,17 +1,16 @@
 import { BaseGrid, Dialog, Input, LargeButton, Modal, Td, Tr, useAlert, useFilter, useGrid, useLoading } from '@bluemarble/bm-components'
 import { Box, Container, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { Form, Formik } from 'formik'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { MdDelete, MdEdit } from 'react-icons/md'
 import { HeadingPage } from '@/components/HeadingPage'
-import type { ApiConnections } from '@/pages/api/connections/index.api'
+import type { ApiModelos } from '@/pages/api/modelos/index.api'
 import { api } from '@/services/api'
 import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
-  { name: 'env_name', label: 'Nome ENV', sx: { width: 250 } },
+  { name: 'name', label: 'Nome', sx: { width: 250 } },
   { name: 'description', label: 'Descrição' },
   { name: 'created_at', label: 'Data Criação', sx: { width: 150 } }
 ] as const
@@ -19,14 +18,13 @@ const columns = [
 type ColumnTitleNames = (typeof columns)[number]['name']
 const columnLabel = (col: ColumnTitleNames) => columns.find(({ name }) => name === col)?.label || ''
 
-const API_URL = '/connections'
+const API_URL = '/modelos'
 
 type ModalOptions = '' | 'update' | 'delete' | 'insert'
 
-export default function ConnectionsPage() {
-  const router = useRouter()
+export default function ModelosPage() {
   const filterGrid = useFilter()
-  const gridData = useGrid<ApiConnections[number]>({ columns: columns as any, filters: filterGrid.filters })
+  const gridData = useGrid<ApiModelos[number]>({ columns: columns as any, filters: filterGrid.filters })
   const [selectedRowId, setSelectedRowId] = useState<number>()
   const selectedRow = useMemo(() => gridData.defaultData.find((row) => row.id === selectedRowId), [selectedRowId])
 
@@ -50,7 +48,7 @@ export default function ConnectionsPage() {
         await api.post(API_URL, fields)
         await getItems()
       },
-      successAlert: 'Conexão inserida com sucesso'
+      successAlert: 'Modelo inserido com sucesso'
     })
   }
 
@@ -60,7 +58,7 @@ export default function ConnectionsPage() {
         await api.put(`${API_URL}?id=${selectedRowId}`, fields)
         await getItems()
       },
-      successAlert: 'Conexão atualizada com sucesso'
+      successAlert: 'Modelo atualizado com sucesso'
     })
   }
 
@@ -71,7 +69,7 @@ export default function ConnectionsPage() {
         await api.delete(`${API_URL}?id=${selectedRowId}`)
         await getItems()
       },
-      successAlert: 'Conexão deletada com sucesso'
+      successAlert: 'Modelo deletado com sucesso'
     })
   }
 
@@ -104,18 +102,14 @@ export default function ConnectionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 2 }}>
-      <HeadingPage title="Conexões" shouldShowButtonBack />
+      <HeadingPage title="Modelos" shouldShowButtonBack />
 
-      <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2, gap: 1 }}>
+      <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2 }}>
         <Box sx={{ flex: 1 }} />
         <LargeButton color="success" onClick={() => setModal('insert')} fullWidth={false}>
-          Add Conexão
+          Add Modelo
         </LargeButton>
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <LargeButton color="info" onClick={() => router.push('/modelos')} fullWidth={false}>
-            Modelos
-          </LargeButton>
-        </Box>
+        <Box sx={{ flex: 1 }} />
       </Stack>
 
       <BaseGrid
@@ -132,7 +126,7 @@ export default function ConnectionsPage() {
         {gridData.data.map((row) => (
           <Tr key={row.id}>
             <TdActions handleActionFn={handleActionItem} id={row.id} />
-            <Td>{row.env_name}</Td>
+            <Td>{row.name}</Td>
             <Td>{row.description}</Td>
             <Td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</Td>
           </Tr>
@@ -145,7 +139,7 @@ export default function ConnectionsPage() {
         open={modal === 'delete'}
         loading={isLoading('delete:item')}
         title="Atenção, esta ação é irreversível"
-        body="Tem certeza que deseja deletar esta conexão?"
+        body="Tem certeza que deseja deletar este modelo?"
         options={[
           { label: 'Cancelar', cb: onClose },
           { label: 'Confirmar', cb: handleDeleteItem, focus: true }
@@ -176,7 +170,7 @@ type BaseFormProps = {
   onSubmit: (fields: any) => Promise<void>
   onClose: () => void
   isUpdateForm?: boolean
-  initialValues?: ApiConnections[number]
+  initialValues?: ApiModelos[number]
 }
 
 const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm }: BaseFormProps) => {
@@ -184,13 +178,13 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm }: BaseFormPr
     <Modal open={true} onClose={onClose}>
       <Box sx={{ px: 2, mb: 2, mt: 1, width: '40vw', maxWidth: 600 }}>
         <Typography sx={{ mb: 2 }} variant="h6" fontWeight="bold">
-          {isUpdateForm ? 'Editar Conexão' : 'Nova Conexão'}
+          {isUpdateForm ? 'Editar Modelo' : 'Novo Modelo'}
         </Typography>
-        <Formik onSubmit={onSubmit} initialValues={initialValues || { env_name: '', description: '' }}>
+        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', description: '' }}>
           {({ isSubmitting }) => (
             <Form>
               <Stack direction="column" gap={2}>
-                <Input name="env_name" label={columnLabel('env_name')} type="text" />
+                <Input name="name" label={columnLabel('name')} type="text" />
                 <Input name="description" label={columnLabel('description')} multiline rows={4} type="text" />
               </Stack>
               <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 3 }}>

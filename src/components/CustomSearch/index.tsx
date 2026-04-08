@@ -1,8 +1,7 @@
-import { MdSearch } from 'react-icons/md'
+import { Input } from '@bluemarble/bm-components'
 
 import { InputAdornment, useMediaQuery } from '@mui/material'
-
-import { Input } from '@bluemarble/bm-components'
+import { MdSearch } from 'react-icons/md'
 
 interface ICustomSearchProps {
   searchValue: string
@@ -10,11 +9,7 @@ interface ICustomSearchProps {
   label: string
 }
 
-export function CustomSearch({
-  searchValue,
-  setSearchValue,
-  label
-}: ICustomSearchProps) {
+export function CustomSearch({ searchValue, setSearchValue, label }: ICustomSearchProps) {
   const isMobileVersion = useMediaQuery('(max-width: 500px)')
 
   return (

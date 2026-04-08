@@ -15,6 +15,7 @@ const columns = [
   { name: '-', label: '', canSort: false },
   { name: 'name', label: 'Nome' },
   { name: 'connections.env_name', label: 'Conexão' },
+  { name: 'modelos.name', label: 'Modelo' },
   { name: 'default_db', label: 'DB Padrão' },
   { name: 'INSTRUÇÕES', label: ' ', sx: { width: 150 } },
   { name: 'system_prompt', label: 'System Prompt', sx: { width: 150 } },
@@ -117,7 +118,10 @@ export default function ProfilesPage() {
         <LargeButton color="success" onClick={() => setModal('insert')} fullWidth={false}>
           Add Profile
         </LargeButton>
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <LargeButton color="info" onClick={() => router.push('/modelos')} fullWidth={false}>
+            Modelos
+          </LargeButton>
           <LargeButton color="info" onClick={() => router.push('/connections')} fullWidth={false}>
             Conexões
           </LargeButton>
@@ -140,6 +144,7 @@ export default function ProfilesPage() {
             <TdActions handleActionFn={handleActionItem} id={row.id} />
             <Td>{row.name}</Td>
             <Td>{row.connections?.description || '-'}</Td>
+            <Td>{row.modelos?.name || '-'}</Td>
             <Td>{row.default_db}</Td>
             <Td sx={{ p: '3px!important' }}>
               <LargeButton sx={{ p: 0 }} color="inherit" size="small" onClick={() => router.push(`/instructions?profile_id=${row.id}`)}>
@@ -208,6 +213,7 @@ type BaseFormProps = {
 
 const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: BaseFormProps) => {
   const [connections, isLoadingConnections] = useFetch<ApiConnections>('/connections', [])
+  const [modelos, isLoadingModelos] = useFetch<any[]>('/modelos', [])
   const { createAlert } = useAlert()
   return (
     <Modal open={true} onClose={onClose}>
@@ -216,9 +222,9 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: Bas
           {isUpdateForm ? 'Editar Perfil' : 'Novo Perfil'}
         </Typography>
 
-        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', apikey: '', system_prompt: '', system_prompt_teste: '', db_schema: '', default_db: '', connection_id: '' }}>
+        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', apikey: '', system_prompt: '', system_prompt_teste: '', db_schema: '', default_db: '', connection_id: '', modelo_id: '' }}>
           {({ isSubmitting, values }) => {
-            if (isLoadingConnections) return <CircularProgress />
+            if (isLoadingConnections || isLoadingModelos) return <CircularProgress />
             return (
               <Form>
                 <Stack direction="column" gap={2}>
@@ -252,6 +258,16 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: Bas
                             isOptionEqualToValue={(a, b) => a?.id === b?.id}
                           />
                           <Input name="default_db" label="DB Padrão" type="text" />
+                        </Stack>
+                        <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
+                          <Autocomplete
+                            name="modelo_id"
+                            label="Modelo"
+                            options={modelos || []}
+                            getOptionLabel={(option) => option?.name || ''}
+                            getOptionValue={(option) => option?.id}
+                            isOptionEqualToValue={(a, b) => a?.id === b?.id}
+                          />
                         </Stack>
                         <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
                           <LargeButton
