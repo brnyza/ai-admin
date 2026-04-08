@@ -1,11 +1,8 @@
-import { MdArrowBack, MdLocationOn } from 'react-icons/md'
-
-import { useRouter } from 'next/router'
-
-import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material'
-
-import { Spinner } from '../Spínner'
+import { Box, Divider, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { MdArrowBack, MdLocationOn } from 'react-icons/md'
+import { Spinner } from '../Spínner'
 
 type HeadingPageProps = {
   title: string
@@ -14,12 +11,7 @@ type HeadingPageProps = {
   location?: string
 }
 
-export function HeadingPage({
-  title,
-  shouldShowButtonBack = false,
-  isLoadingData = false,
-  location
-}: HeadingPageProps) {
+export function HeadingPage({ title, shouldShowButtonBack = false, isLoadingData = false, location }: HeadingPageProps) {
   const router = useRouter()
   return (
     <>
@@ -28,7 +20,7 @@ export function HeadingPage({
       </Head>
       <Stack
         sx={{
-          py: 2,
+          py: 0,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -37,20 +29,15 @@ export function HeadingPage({
         direction="row"
         spacing={1}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', m: 0, p: 0 }}>
           {shouldShowButtonBack && (
             <Tooltip title="Voltar">
-              <IconButton onClick={() => router.back()}>
+              <IconButton size="small" sx={{ p: 0, pr: 1 }} onClick={() => router.back()}>
                 <MdArrowBack />
               </IconButton>
             </Tooltip>
           )}
-          <Typography
-            variant="h6"
-            component="h1"
-            fontWeight="bold"
-            color="GrayText"
-          >
+          <Typography variant="h6" component="h1" fontWeight="bold" color="GrayText">
             {title}
           </Typography>
           {isLoadingData && <Spinner />}
@@ -72,6 +59,7 @@ export function HeadingPage({
           </Box>
         )}
       </Stack>
+      <Divider sx={{ mb: 2 }} />
     </>
   )
 }

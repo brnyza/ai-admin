@@ -2,15 +2,12 @@ import { prisma } from '@/libs/prisma'
 import { withAuth } from '@/middlewares'
 import { withLog } from '@/middlewares/withLog'
 
-const getProfiles = async () => {
-  const result = await prisma.profiles.findMany({
-    orderBy: { name: 'asc' },
-    include: { connections: true }
-  })
+const getConnections = async () => {
+  const result = await prisma.connections.findMany({ orderBy: { env_name: 'asc' } })
   return result
 }
 
-export type ApiProfiles = Awaited<ReturnType<typeof getProfiles>>
+export type ApiConnections = Awaited<ReturnType<typeof getConnections>>
 
 const handler = async (req: any, res: any) => {
   try {
@@ -27,19 +24,18 @@ const handler = async (req: any, res: any) => {
   async function GET() {
     const { id } = req.query
     if (id) {
-      const result = await prisma.profiles.findUnique({
-        where: { id: String(id) },
-        include: { connections: true }
+      const result = await prisma.connections.findUnique({
+        where: { id: Number(id) }
       })
       return res.json(result)
     }
-    const result = await getProfiles()
+    const result = await getConnections()
     return res.json(result)
   }
 
   async function POST() {
     const data = req.body
-    const result = await prisma.profiles.create({ data })
+    const result = await prisma.connections.create({ data })
     return res.status(201).json(result)
   }
 
@@ -51,10 +47,9 @@ const handler = async (req: any, res: any) => {
     delete data.id
     delete data.created_at
     delete data.updated_at
-    delete data.connections
 
-    const result = await prisma.profiles.update({
-      where: { id: String(id) },
+    const result = await prisma.connections.update({
+      where: { id: Number(id) },
       data: {
         ...data,
         updated_at: new Date()
@@ -65,8 +60,8 @@ const handler = async (req: any, res: any) => {
 
   async function DELETE() {
     const { id } = req.query
-    await prisma.profiles.delete({
-      where: { id: String(id) }
+    await prisma.connections.delete({
+      where: { id: Number(id) }
     })
     return res.json({ msg: 'ok' })
   }

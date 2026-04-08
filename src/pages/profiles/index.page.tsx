@@ -1,21 +1,25 @@
-import { BaseGrid, Dialog, Input, LargeButton, Modal, Td, Tr, useAlert, useFilter, useGrid, useLoading } from '@bluemarble/bm-components'
-import { Box, Container, IconButton, Stack, Tooltip, Typography } from '@mui/material'
+import { Autocomplete, BaseGrid, Dialog, Input, LargeButton, Modal, Td, Tr, useAlert, useFilter, useGrid, useLoading } from '@bluemarble/bm-components'
+import { Box, CircularProgress, Container, Divider, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { Form, Formik } from 'formik'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { MdDelete, MdEdit } from 'react-icons/md'
 import { HeadingPage } from '@/components/HeadingPage'
+import { useFetch } from '@/hooks/useFetch'
+import type { ApiConnections } from '@/pages/api/connections/index.api'
 import type { ApiProfiles } from '@/pages/api/profiles/index.api'
 import { api } from '@/services/api'
 import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
-  { name: 'name', label: 'Nome', sx: { width: 150 } },
+  { name: 'name', label: 'Nome' },
+  { name: 'connections.env_name', label: 'Conexão' },
+  { name: 'default_db', label: 'DB Padrão' },
   { name: 'INSTRUÇÕES', label: ' ', sx: { width: 150 } },
-  { name: 'system_prompt', label: 'System Prompt' },
-  { name: 'db_schema', label: 'DB Schema' },
-  { name: 'created_at', label: 'Data Criação', sx: { width: 150 } }
+  { name: 'system_prompt', label: 'System Prompt', sx: { width: 150 } },
+  { name: 'db_schema', label: 'DB Schema', sx: { width: 150 } },
+  { name: 'created_at', label: 'Data Criação', sx: { width: 130 } }
 ] as const
 
 type ColumnTitleNames = (typeof columns)[number]['name']
@@ -23,7 +27,7 @@ const columnLabel = (col: ColumnTitleNames) => columns.find(({ name }) => name =
 
 const API_URL = '/profiles'
 
-type ModalOptions = '' | 'update' | 'delete' | 'insert'
+type ModalOptions = '' | 'update' | 'delete' | 'insert' | 'update-system-prompt' | 'update-db-schema'
 
 export default function ProfilesPage() {
   const router = useRouter()
@@ -108,10 +112,16 @@ export default function ProfilesPage() {
     <Container maxWidth="xl" sx={{ mt: 2 }}>
       <HeadingPage title="AI Profiles" />
 
-      <Stack direction="row" gap={1} alignItems="center" sx={{ mb: 2 }}>
+      <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ flex: 1 }} />
         <LargeButton color="success" onClick={() => setModal('insert')} fullWidth={false}>
-          + Profile
+          Add Profile
         </LargeButton>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <LargeButton color="info" onClick={() => router.push('/connections')} fullWidth={false}>
+            Conexões
+          </LargeButton>
+        </Box>
       </Stack>
 
       <BaseGrid
@@ -129,20 +139,34 @@ export default function ProfilesPage() {
           <Tr key={row.id}>
             <TdActions handleActionFn={handleActionItem} id={row.id} />
             <Td>{row.name}</Td>
-            <Td>
-              <LargeButton size="small" onClick={() => router.push(`/instructions?profile_id=${row.id}`)}>
+            <Td>{row.connections?.description || '-'}</Td>
+            <Td>{row.default_db}</Td>
+            <Td sx={{ p: '3px!important' }}>
+              <LargeButton sx={{ p: 0 }} color="inherit" size="small" onClick={() => router.push(`/instructions?profile_id=${row.id}`)}>
                 Instruções
               </LargeButton>
             </Td>
-            <Td sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.system_prompt}</Td>
-            <Td sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.db_schema}</Td>
+            <Td sx={{ p: '3px!important' }}>
+              <LargeButton sx={{ p: 0 }} color="inherit" size="small" onClick={() => handleActionItem(row.id, 'update-system-prompt')}>
+                {row.system_prompt ? 'Editar' : 'Adicionar'}
+              </LargeButton>
+            </Td>
+            <Td sx={{ p: '3px!important' }}>
+              <LargeButton sx={{ p: 0 }} color="inherit" size="small" onClick={() => handleActionItem(row.id, 'update-db-schema')}>
+                {row.db_schema ? 'Editar' : 'Adicionar'}
+              </LargeButton>
+            </Td>
+            {/* <Td sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.system_prompt}</Td> */}
+            {/* <Td sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.db_schema}</Td> */}
             <Td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</Td>
           </Tr>
         ))}
       </BaseGrid>
 
-      {modal === 'insert' && <BaseForm onClose={onClose} onSubmit={handleCreateItem} />}
-      {modal === 'update' && <BaseForm onClose={onClose} onSubmit={handleUpdateItem} isUpdateForm initialValues={selectedRow} />}
+      {modal === 'insert' && <BaseForm onClose={onClose} onSubmit={handleCreateItem} modal={modal} />}
+      {modal === 'update' && <BaseForm onClose={onClose} onSubmit={handleUpdateItem} isUpdateForm initialValues={selectedRow} modal={modal} />}
+      {modal === 'update-system-prompt' && <BaseForm onClose={onClose} onSubmit={handleUpdateItem} isUpdateForm initialValues={selectedRow} modal={modal} />}
+      {modal === 'update-db-schema' && <BaseForm onClose={onClose} onSubmit={handleUpdateItem} isUpdateForm initialValues={selectedRow} modal={modal} />}
       <Dialog
         open={modal === 'delete'}
         loading={isLoading('delete:item')}
@@ -179,37 +203,92 @@ type BaseFormProps = {
   onClose: () => void
   isUpdateForm?: boolean
   initialValues?: ApiProfiles[number]
+  modal: ModalOptions
 }
 
-const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm }: BaseFormProps) => {
+const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: BaseFormProps) => {
+  const [connections, isLoadingConnections] = useFetch<ApiConnections>('/connections', [])
+  const { createAlert } = useAlert()
   return (
     <Modal open={true} onClose={onClose}>
-      <Box sx={{ px: 2, mb: 2, mt: 1, width: '90vw', overflowY: 'scroll', maxHeight: '90vh' }}>
+      <Box sx={{ px: 2, mb: 2, mt: 1, width: '90vw', overflowY: 'auto', maxHeight: '90vh', maxWidth: modal === 'update' ? 600 : undefined }}>
         <Typography sx={{ mb: 2 }} variant="h6" fontWeight="bold">
           {isUpdateForm ? 'Editar Perfil' : 'Novo Perfil'}
         </Typography>
-        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', apikey: '', system_prompt: '', system_prompt_teste: '', db_schema: '' }}>
-          {({ isSubmitting }) => (
-            <Form>
-              <Stack direction="column" gap={2}>
-                <Stack direction="row" gap={2}>
-                  <Input sx={{ width: 200 }} name="name" label="Nome" type="text" />
-                  <Input name="apikey" label="API Key" type="text" />
+
+        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', apikey: '', system_prompt: '', system_prompt_teste: '', db_schema: '', default_db: '', connection_id: '' }}>
+          {({ isSubmitting, values }) => {
+            if (isLoadingConnections) return <CircularProgress />
+            return (
+              <Form>
+                <Stack direction="column" gap={2}>
+                  {(() => {
+                    if (modal === 'update-system-prompt') {
+                      return (
+                        <Stack direction="row" gap={2}>
+                          <Input name="system_prompt" label="System Prompt" multiline rows={30} type="text" />
+                        </Stack>
+                      )
+                    }
+                    if (modal === 'update-db-schema') {
+                      return (
+                        <Stack direction="row" gap={2}>
+                          <Input name="db_schema" label="DB Schema" multiline rows={30} type="text" />
+                        </Stack>
+                      )
+                    }
+                    return (
+                      <Stack direction="column" gap={2}>
+                        <Input name="name" label="Nome do Profile" type="text" />
+                        <Input name="apikey" label="API Key" type="text" />
+                        <Divider />
+                        <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
+                          <Autocomplete
+                            name="connection_id"
+                            label="Conexão"
+                            options={connections || []}
+                            getOptionLabel={(option) => option?.description || ''}
+                            getOptionValue={(option) => option?.id}
+                            isOptionEqualToValue={(a, b) => a?.id === b?.id}
+                          />
+                          <Input name="default_db" label="DB Padrão" type="text" />
+                        </Stack>
+                        <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
+                          <LargeButton
+                            color="inherit"
+                            onClick={async () => {
+                              const connection = connections?.find((connection) => connection.id === values?.connection_id)
+                              try {
+                                await api.post('/testar-conexao', { env_name: connection?.env_name, default_db: values?.default_db })
+                                createAlert('Teste de Conexão ok!', 'success')
+                              } catch (error: any) {
+                                if (error.response.data.msg) {
+                                  createAlert(error.response.data.msg, 'error')
+                                } else {
+                                  createAlert(error.message, 'error')
+                                }
+                              }
+                            }}
+                            fullWidth={false}
+                          >
+                            Testar Conexão
+                          </LargeButton>
+                        </Stack>
+                      </Stack>
+                    )
+                  })()}
                 </Stack>
-                <Input name="system_prompt" label="System Prompt" multiline rows={15} type="text" />
-                {/* <Input name="system_prompt_teste" label="System Prompt (Teste)" multiline rows={15} type="text" /> */}
-                <Input name="db_schema" label="DB Schema" multiline rows={15} type="text" />
-              </Stack>
-              <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 3 }}>
-                <LargeButton color="inherit" onClick={onClose} fullWidth={false}>
-                  Cancelar
-                </LargeButton>
-                <LargeButton loading={isSubmitting} type="submit" fullWidth={false}>
-                  {isUpdateForm ? 'Salvar alterações' : 'Criar novo'}
-                </LargeButton>
-              </Stack>
-            </Form>
-          )}
+                <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 3 }}>
+                  <LargeButton color="inherit" onClick={onClose} fullWidth={false}>
+                    Cancelar
+                  </LargeButton>
+                  <LargeButton color="success" loading={isSubmitting} type="submit" fullWidth={false}>
+                    {isUpdateForm ? 'Salvar alterações' : 'Criar novo'}
+                  </LargeButton>
+                </Stack>
+              </Form>
+            )
+          }}
         </Formik>
       </Box>
     </Modal>

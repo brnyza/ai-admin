@@ -56,14 +56,17 @@ model log_uso {
 }
 
 model profiles {
-  id                  String    @id(map: "profiles_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  apikey              String?   @db.VarChar
-  name                String?   @db.VarChar
-  system_prompt       String?   @db.VarChar
-  system_prompt_teste String?   @db.VarChar
-  db_schema           String?   @db.VarChar
-  created_at          DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime? @db.Timestamptz(6)
+  id                  String       @id(map: "profiles_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  apikey              String?      @db.VarChar
+  name                String?      @db.VarChar
+  system_prompt       String?      @db.VarChar
+  system_prompt_teste String?      @db.VarChar
+  db_schema           String?      @db.VarChar
+  created_at          DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime?    @db.Timestamptz(6)
+  default_db          String?      @db.VarChar
+  connection_id       Int?
+  connections         connections? @relation(fields: [connection_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "profiles_connections_fk")
 }
 
 model thread_messages {
@@ -112,4 +115,13 @@ model sec_log {
   params     String?   @db.VarChar
   ip         String?   @db.VarChar
   remarks    String?   @db.VarChar
+}
+
+model connections {
+  id          Int        @id(map: "connections_pk") @default(autoincrement())
+  env_name    String?    @db.VarChar
+  description String?    @db.VarChar
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?  @db.Timestamptz(6)
+  profiles    profiles[]
 }
