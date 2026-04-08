@@ -17,9 +17,9 @@ const columns = [
   { name: 'connections.env_name', label: 'Conexão' },
   { name: 'modelos.name', label: 'Modelo' },
   { name: 'default_db', label: 'DB Padrão' },
-  { name: 'INSTRUÇÕES', label: ' ', sx: { width: 150 } },
-  { name: 'system_prompt', label: 'System Prompt', sx: { width: 150 } },
-  { name: 'db_schema', label: 'DB Schema', sx: { width: 150 } },
+  { name: 'INSTRUÇÕES', label: ' ', sx: { width: 120 } },
+  { name: 'system_prompt', label: 'System Prompt', sx: { width: 120 } },
+  { name: 'db_schema', label: 'DB Schema', sx: { width: 120 } },
   { name: 'created_at', label: 'Data Criação', sx: { width: 130 } }
 ] as const
 
@@ -132,7 +132,7 @@ export default function ProfilesPage() {
         paperProps={{
           sx: {
             'td, th': { p: 1, textAlign: 'center' },
-            th: { fontWeight: 600 }
+            th: { fontWeight: 600, svg: { display: 'none' } }
           }
         }}
         {...gridData}
@@ -260,14 +260,7 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: Bas
                           <Input name="default_db" label="DB Padrão" type="text" />
                         </Stack>
                         <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
-                          <Autocomplete
-                            name="modelo_id"
-                            label="Modelo"
-                            options={modelos || []}
-                            getOptionLabel={(option) => option?.name || ''}
-                            getOptionValue={(option) => option?.id}
-                            isOptionEqualToValue={(a, b) => a?.id === b?.id}
-                          />
+                          <Autocomplete name="modelo_id" label="Modelo" options={modelos || []} getOptionLabel={(option) => option?.name || ''} getOptionValue={(option) => option?.id} isOptionEqualToValue={(a, b) => a?.id === b?.id} />
                         </Stack>
                         <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 0, mb: 2 }}>
                           <LargeButton

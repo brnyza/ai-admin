@@ -12,6 +12,28 @@ const getProfiles = async () => {
 
 export type ApiProfiles = Awaited<ReturnType<typeof getProfiles>>
 
+/**
+ * Limpa o payload transformando strings vazias em null
+ * e removendo campos indesejados.
+ */
+function cleanPayload(data: any, excludeFields: string[] = []) {
+  const cleanData = { ...data }
+  
+  // Remove campos específicos (metadados/relações)
+  excludeFields.forEach(field => {
+    delete cleanData[field]
+  })
+
+
+  // Converte strings vazias para null
+  Object.keys(cleanData).forEach(key => {
+    if (cleanData[key] === '') cleanData[key] = null
+  })
+
+  return cleanData
+}
+
+
 const handler = async (req: any, res: any) => {
   try {
     if (req.method === 'GET') return await GET()
@@ -38,23 +60,18 @@ const handler = async (req: any, res: any) => {
   }
 
   async function POST() {
-    const data = req.body
+    const data = cleanPayload(req.body)
     const result = await prisma.profiles.create({ data })
     return res.status(201).json(result)
   }
 
+
   async function PUT() {
     const { id } = req.query
-    const data = req.body
-
-    // Remove metadata fields that shouldn't be updated manually
-    delete data.id
-    delete data.created_at
-    delete data.updated_at
-    delete data.connections
-    delete data.modelos
+    const data = cleanPayload(req.body, ['id', 'created_at', 'updated_at', 'connections', 'modelos'])
 
     const result = await prisma.profiles.update({
+
       where: { id: String(id) },
       data: {
         ...data,

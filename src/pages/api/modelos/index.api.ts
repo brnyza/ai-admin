@@ -35,6 +35,7 @@ const handler = async (req: any, res: any) => {
 
   async function POST() {
     const data = req.body
+
     const result = await prisma.modelos.create({ data })
     return res.status(201).json(result)
   }
@@ -48,6 +49,14 @@ const handler = async (req: any, res: any) => {
     delete data.created_at
     delete data.updated_at
     delete data.profiles // Remove relations if any
+
+    if (data?.connection_id === '') data.connection_id = null
+    if (data?.modelo_id === '') data.modelo_id = null
+    if (data?.default_db === '') data.default_db = null
+    if (data?.db_schema === '') data.db_schema = null
+    if (data?.system_prompt === '') data.system_prompt = null
+    if (data?.system_prompt_teste === '') data.system_prompt_teste = null
+    if (data?.apikey === '') data.apikey = null
 
     const result = await prisma.modelos.update({
       where: { id: Number(id) },
