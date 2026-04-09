@@ -28,7 +28,7 @@ export default function InstructionsPage() {
   const { profile_id } = router.query
 
   const filterGrid = useFilter()
-  const gridData = useGrid<ApiInstructions[number]>({ columns: columns as any, filters: filterGrid.filters })
+  const gridData = useGrid<ApiInstructions[number]>({ columns: columns as any, filters: filterGrid.filters, rowsPerPageOptions: [100, 200, 300] })
   const [selectedRowId, setSelectedRowId] = useState<string>()
   const selectedRow = useMemo(() => gridData.defaultData.find((row) => row.id === selectedRowId), [selectedRowId])
 

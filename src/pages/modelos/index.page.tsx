@@ -10,9 +10,9 @@ import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
-  { name: 'name', label: 'Nome', sx: { width: 250 } },
+  { name: 'name', label: 'Nome', sx: { width: 300 } },
   { name: 'description', label: 'Descrição' },
-  { name: 'created_at', label: 'Data Criação', sx: { width: 150 } }
+  { name: 'created_at', label: 'Data Criação', sx: { width: 120 } }
 ] as const
 
 type ColumnTitleNames = (typeof columns)[number]['name']
@@ -101,7 +101,7 @@ export default function ModelosPage() {
   }, [])
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2 }}>
+    <Container sx={{ mt: 2 }}>
       <HeadingPage title="Modelos" shouldShowButtonBack />
 
       <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2 }}>

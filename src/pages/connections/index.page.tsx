@@ -11,9 +11,9 @@ import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
-  { name: 'env_name', label: 'Nome ENV', sx: { width: 250 } },
-  { name: 'description', label: 'Descrição' },
-  { name: 'created_at', label: 'Data Criação', sx: { width: 150 } }
+  { name: 'env_name', label: 'Nome ENV', sx: { width: 200 } },
+  { name: 'description', label: 'Descrição', sx: { width: 250 } },
+  { name: 'created_at', label: 'Data Criação', sx: { width: 120 } }
 ] as const
 
 type ColumnTitleNames = (typeof columns)[number]['name']
@@ -103,7 +103,7 @@ export default function ConnectionsPage() {
   }, [])
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2 }}>
+    <Container sx={{ mt: 2 }}>
       <HeadingPage title="Conexões" shouldShowButtonBack />
 
       <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2, gap: 1 }}>
@@ -111,11 +111,7 @@ export default function ConnectionsPage() {
         <LargeButton color="success" onClick={() => setModal('insert')} fullWidth={false}>
           Add Conexão
         </LargeButton>
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <LargeButton color="info" onClick={() => router.push('/modelos')} fullWidth={false}>
-            Modelos
-          </LargeButton>
-        </Box>
+        <Box sx={{ flex: 1 }} />
       </Stack>
 
       <BaseGrid

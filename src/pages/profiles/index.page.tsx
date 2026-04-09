@@ -125,6 +125,9 @@ export default function ProfilesPage() {
           <LargeButton color="info" onClick={() => router.push('/connections')} fullWidth={false}>
             Conexões
           </LargeButton>
+          <LargeButton color="info" onClick={() => router.push('/log_uso')} fullWidth={false}>
+            Logs
+          </LargeButton>
         </Box>
       </Stack>
 
@@ -217,7 +220,7 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm, modal }: Bas
   const { createAlert } = useAlert()
   return (
     <Modal open={true} onClose={onClose}>
-      <Box sx={{ px: 2, mb: 2, mt: 1, width: '90vw', overflowY: 'auto', maxHeight: '90vh', maxWidth: modal === 'update' ? 600 : undefined }}>
+      <Box sx={{ px: 2, mb: 2, mt: 1, width: '90vw', overflowY: 'auto', maxHeight: '90vh', maxWidth: modal === 'update' || modal === 'insert' ? 600 : undefined }}>
         <Typography sx={{ mb: 2 }} variant="h6" fontWeight="bold">
           {isUpdateForm ? 'Editar Perfil' : 'Novo Perfil'}
         </Typography>
