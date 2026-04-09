@@ -11,9 +11,9 @@ import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
-  { name: 'name', label: 'Nome', sx: { width: 250 } },
+  { name: 'name', label: 'Nome', sx: { width: 500 } },
   { name: 'instruction', label: 'Instrução' },
-  { name: 'created_at', label: 'Data Criação', sx: { width: 150 } }
+  { name: 'created_at', label: 'Data Criação', sx: { width: 100 } }
 ] as const
 
 type ColumnTitleNames = (typeof columns)[number]['name']
@@ -113,7 +113,7 @@ export default function InstructionsPage() {
   }, [router.isReady, profile_id])
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2 }}>
+    <Container sx={{ mt: 2, width: '100%', minWidth: '100%' }}>
       <HeadingPage title={`Instruções do Profile: ${profile?.name || '...'}`} shouldShowButtonBack />
 
       <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 2 }}>
@@ -127,7 +127,7 @@ export default function InstructionsPage() {
       <BaseGrid
         paperProps={{
           sx: {
-            'td, th': { p: 1, textAlign: 'center' },
+            'td, th': { p: 0.3 },
             th: { fontWeight: 600 }
           }
         }}
@@ -138,8 +138,8 @@ export default function InstructionsPage() {
         {gridData.data.map((row) => (
           <Tr key={row.id}>
             <TdActions handleActionFn={handleActionItem} id={row.id} />
-            <Td>{row.name}</Td>
-            <Td sx={{ maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.instruction}</Td>
+            <Td sx={{ textAlign: 'left!important' }}>{row.name}</Td>
+            <Td sx={{ textAlign: 'left!important', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.instruction}</Td>
             <Td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</Td>
           </Tr>
         ))}
