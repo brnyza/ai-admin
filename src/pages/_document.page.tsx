@@ -1,4 +1,4 @@
-// biome-ignore lint/suspicious/noDocumentImportInPage: <???>
+// biome-ignore lint/suspicious/noDocumentImportInPage: <o arquivo está correto, somente com .page o que buga essa regra>
 import Document, { Head, Html, Main, NextScript } from 'next/document'
 
 export default class MyDocument extends Document {

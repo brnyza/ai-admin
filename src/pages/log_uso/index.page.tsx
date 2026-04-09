@@ -1,6 +1,6 @@
 import { BaseGrid, Td, Tr, useAlert, useFilter, useGrid, useLoading } from '@bluemarble/bm-components'
-import { Container,  Tooltip } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { Container, Tooltip } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { HeadingPage } from '@/components/HeadingPage'
 import type { ApiLogUso } from '@/pages/api/log_uso/index.api'
 import { api } from '@/services/api'
@@ -15,7 +15,6 @@ const columns = [
   { name: 'thread_id', label: 'Thread ID', sx: { width: 300 } }
 ] as const
 
-
 const API_URL = '/log_uso'
 
 type ModalOptions = '' | 'update' | 'delete' | 'insert'
@@ -24,7 +23,6 @@ export default function LogUsoPage() {
   const filterGrid = useFilter()
   const gridData = useGrid<ApiLogUso[number]>({ columns: columns as any, filters: filterGrid.filters, rowsPerPageOptions: [100, 200, 300] })
   const [selectedRowId, setSelectedRowId] = useState<number>()
-  const selectedRow = useMemo(() => gridData.defaultData.find((row) => row.id === selectedRowId), [selectedRowId])
 
   const [modal, setModal] = useState<ModalOptions>('')
   const { isLoading, setLoading } = useLoading()
@@ -70,7 +68,7 @@ export default function LogUsoPage() {
         paperProps={{
           sx: {
             'td, th': { p: 0.3, px: 1, textAlign: 'center' },
-            th: { fontWeight: 600, svg: { display: 'none' } }
+            th: { fontWeight: 400, svg: { display: 'none' } }
           }
         }}
         {...gridData}
@@ -104,5 +102,3 @@ const formataType = (type: string | null) => {
   if (type === 'result') return `✅ ${type}`
   return type
 }
-
-
