@@ -11,7 +11,7 @@ datasource db {
 model instructions {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profile_id  String?   @db.Uuid
-  name        String?   @db.VarChar(50)
+  name        String?
   instruction String?
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   updated_at  DateTime? @db.Timestamptz(6)
@@ -57,7 +57,7 @@ model log_uso {
 
 model profiles {
   id                  String       @id(map: "profiles_pk") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  apikey              String?      @db.VarChar
+  apikey              String?      @unique(map: "profiles_apikey_idx") @db.VarChar
   name                String?      @db.VarChar
   system_prompt       String?      @db.VarChar
   system_prompt_teste String?      @db.VarChar

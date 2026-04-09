@@ -59,7 +59,7 @@ export default function Home() {
         <Box sx={{ m: 0, mb: 0 }}>
           <Image src={logoImg} alt="logo" objectFit="contain" width={430} height={230} />
         </Box>
-        <Formik initialValues={{ email: '', password: '' }} onSubmit={handleSubmit} style={{ width: '100%' }}>
+        <Formik initialValues={{ email: '', password: '' }} onSubmit={handleSubmit}>
           {() => (
             <Form style={{ width: '100%' }}>
               <Stack gap={1} mt={1}>

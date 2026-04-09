@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { api } from '@/services/api'
 import { getErrorMessage } from '@/utils/errorHandler'
+import { withSSRGuest } from '@/utils/withSSRGuest'
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false)
@@ -38,7 +39,7 @@ const ForgotPassword = () => {
           <title>Esqueci minha senha</title>
         </Head>
 
-        <Formik initialValues={{ email: '' }} onSubmit={handleSubmit} style={{ width: '100%' }}>
+        <Formik initialValues={{ email: '' }} onSubmit={handleSubmit}>
           {() => (
             <Form style={{ width: '100%' }}>
               <Typography sx={{ fontWeight: 'bold' }}>Digite o email cadastrado e enviaremos uma mensagem para redefinir a sua senha</Typography>
@@ -55,3 +56,5 @@ const ForgotPassword = () => {
 }
 
 export default ForgotPassword
+
+export const getServerSideProps = withSSRGuest(async () => ({ props: {} }))
