@@ -6,12 +6,15 @@ import { MdDelete, MdEdit } from 'react-icons/md'
 import { HeadingPage } from '@/components/HeadingPage'
 import type { ApiModelos } from '@/pages/api/modelos/index.api'
 import { api } from '@/services/api'
+import { formatarNumeroMonetarioUSD, stringToNumber } from '@/utils/convert'
 import { getErrorMessage } from '@/utils/errorHandler'
 
 const columns = [
   { name: '-', label: '', canSort: false },
   { name: 'name', label: 'Nome', sx: { width: 300 } },
   { name: 'description', label: 'Descrição' },
+  { name: 'price_input_million_tokens', label: 'Preço Input (Milhões de Tokens)', sx: { width: 220 } },
+  { name: 'price_output_million_tokens', label: 'Preço Output (Milhões de Tokens)', sx: { width: 220 } },
   { name: 'created_at', label: 'Data Criação', sx: { width: 120 } }
 ] as const
 
@@ -128,6 +131,8 @@ export default function ModelosPage() {
             <TdActions handleActionFn={handleActionItem} id={row.id} />
             <Td>{row.name}</Td>
             <Td>{row.description}</Td>
+            <Td>{formatarNumeroMonetarioUSD(row.price_input_million_tokens)}</Td>
+            <Td>{formatarNumeroMonetarioUSD(row.price_output_million_tokens)}</Td>
             <Td>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</Td>
           </Tr>
         ))}
@@ -180,12 +185,17 @@ const BaseForm = ({ onSubmit, onClose, initialValues, isUpdateForm }: BaseFormPr
         <Typography sx={{ mb: 2 }} variant="h6" fontWeight="bold">
           {isUpdateForm ? 'Editar Modelo' : 'Novo Modelo'}
         </Typography>
-        <Formik onSubmit={onSubmit} initialValues={initialValues || { name: '', description: '' }}>
+        <Formik
+          onSubmit={(values) => onSubmit({ ...values, price_input_million_tokens: stringToNumber(values.price_input_million_tokens), price_output_million_tokens: stringToNumber(values.price_output_million_tokens) })}
+          initialValues={initialValues || { name: '', description: '', price_input_million_tokens: '', price_output_million_tokens: '' }}
+        >
           {({ isSubmitting }) => (
             <Form>
               <Stack direction="column" gap={2}>
                 <Input name="name" label={columnLabel('name')} type="text" />
                 <Input name="description" label={columnLabel('description')} multiline rows={4} type="text" />
+                <Input name="price_input_million_tokens" label={columnLabel('price_input_million_tokens')} type="text" />
+                <Input name="price_output_million_tokens" label={columnLabel('price_output_million_tokens')} type="text" />
               </Stack>
               <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 3 }}>
                 <LargeButton color="inherit" onClick={onClose} fullWidth={false}>

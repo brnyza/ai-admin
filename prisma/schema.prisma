@@ -129,10 +129,12 @@ model connections {
 }
 
 model modelos {
-  id          Int        @id(map: "connections_pk_1") @default(autoincrement())
-  name        String?    @db.VarChar
-  description String?    @db.VarChar
-  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?  @db.Timestamptz(6)
-  profiles    profiles[]
+  id                          Int        @id(map: "connections_pk_1") @default(autoincrement())
+  name                        String?    @db.VarChar
+  description                 String?    @db.VarChar
+  created_at                  DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime?  @db.Timestamptz(6)
+  price_input_million_tokens  Decimal?   @db.Decimal
+  price_output_million_tokens Decimal?   @db.Decimal
+  profiles                    profiles[]
 }
